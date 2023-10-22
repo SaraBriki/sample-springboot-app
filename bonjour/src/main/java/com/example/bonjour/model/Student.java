@@ -9,7 +9,13 @@ public class Student {
     @Id
     private String id;
     private String firstName;
+    private String lastName;
+    private int age;
+    private String university;
+    private String academicLevel;
+    private String specialization;
 
+    // Constructor
     public Student(String id, String firstName, String lastName, int age, String university, String academicLevel, String specialization) {
         this.id = id;
         this.firstName = firstName;
@@ -19,12 +25,6 @@ public class Student {
         this.academicLevel = academicLevel;
         this.specialization = specialization;
     }
-
-    private String lastName;
-    private int age;
-    private String university;
-    private String academicLevel;
-    private String specialization;
 
 // Getters
     public String getFirstName(){

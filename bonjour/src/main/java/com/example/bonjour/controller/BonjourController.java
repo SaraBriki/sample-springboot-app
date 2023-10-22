@@ -1,5 +1,4 @@
 package com.example.bonjour.controller;
-// Importing required classes
 
 import com.example.bonjour.repository.IStudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +18,14 @@ public class BonjourController {
         this.repository = repository;
     }
 
-    @RequestMapping(value = "/bonjour/{index}", method = RequestMethod.GET)
+    @RequestMapping(value = "/bonjour/{age}", method = RequestMethod.GET)
     @ResponseBody
     // Method
-    public String direBonjour(@PathVariable("index") int index) {
+    public String direBonjour(@PathVariable("age") int age) {
         try {
-            return "Bonjour " + repository.findAll().get(index).getFullName() + "!";
-        } catch (IndexOutOfBoundsException e) {
-            return "There is no person in the database with the given index (index out of bound!)";
+            return "Bonjour " + repository.findStudentByAge(age).getFullName() + "!";
+        } catch (NullPointerException e) {
+            return "There is no student with the given age.";
         }
     }
 }
