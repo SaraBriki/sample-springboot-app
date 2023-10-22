@@ -1,5 +1,6 @@
-package com.example.bonjour;
+package com.example.bonjour.model;
 
+import jdk.jfr.DataAmount;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -8,6 +9,17 @@ public class Student {
     @Id
     private String id;
     private String firstName;
+
+    public Student(String id, String firstName, String lastName, int age, String university, String academicLevel, String specialization) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.university = university;
+        this.academicLevel = academicLevel;
+        this.specialization = specialization;
+    }
+
     private String lastName;
     private int age;
     private String university;
@@ -23,6 +35,9 @@ public class Student {
         return this.lastName;
     }
 
+    public String getFullName(){
+        return this.firstName + " " + this.lastName;
+    }
     public int getAge() {
         return this.age;
     }
