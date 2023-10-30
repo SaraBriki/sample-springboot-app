@@ -1,0 +1,22 @@
+version: '3'
+services:
+  spring-boot-app:
+    image: docker-lab.jar
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      SPRING_DATA_MONGODB_HOST: host.docker.internal
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: University
+
+  mongodb:
+    image: my-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
