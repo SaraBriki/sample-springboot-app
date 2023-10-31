@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    environment {
+        GIT_REPO_URL = 'https://github.com/SaraBriki/sample-springboot-app.git'
+        GIT_CREDENTIALS_ID = 'githubcred'
+        appImageName = "docker-lab.jar"
+	mongoDBImageName = "my-mongo"
+        registryCredential = 'dockerhub'
+        dockerImage = ''
+    }
+
+    stages {
+        stage('Fetch from Git') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']],
+                    userRemoteConfigs: [[credentialsId: GIT_CREDENTIALS_ID, url: GIT_REPO_URL]]])
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                bat 'mvn clean install'
+            }
+        }
+
+	stage('Build DB Docker Image') {
+            steps {
+                script {
+                    mongoDockerImage = docker.build mongoDBImageName
+                }
+            }
+        }
+
+        stage('Push DB Image') {
+          steps{
+            script {
+              docker.withRegistry( '', registryCredential ) {
+                 mongoDockerImage.push("$BUILD_NUMBER")
+                 mongoDockerImage.push('latest')
+              }
+            }
+          }
+        }
+
+        stage('Build App Docker Image') {
+            steps {
+                script {
+                    appDockerImage = docker.build appImageName
+                }
+            }
+        }
+
+	stage('Push App Image') {
+          steps{
+            script {
+              docker.withRegistry( '', registryCredential ) {
+                 appDockerImage.push("$BUILD_NUMBER")
+                 appDockerImage.push('latest')
+              }
+            }
+          }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                bat 'ansible-playbook -i inventory.ini playbook.yml'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Successfully completed pipeline! By Sara, Emna & Youssef'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
