@@ -4,8 +4,8 @@ pipeline {
     environment {
         GIT_REPO_URL = 'https://github.com/SaraBriki/sample-springboot-app.git'
         GIT_CREDENTIALS_ID = 'githubcred'
-        appImageName = "docker-lab.jar"
-	mongoDBImageName = "my-mongo"
+        appImageName = "my-app"
+	    mongoDBImageName = "my-mongo"
         registryCredential = 'dockerhub'
         dockerImage = ''
     }
@@ -24,13 +24,13 @@ pipeline {
             }
         }
 
-	stage('Build DB Docker Image') {
-            steps {
-                script {
-                    mongoDockerImage = docker.build mongoDBImageName
+        stage('Build DB Docker Image') {
+            dir('./docker/db'){
+                    script {
+                        mongoDockerImage = docker.build mongoDBImageName
+                    }
                 }
             }
-        }
 
         stage('Push DB Image') {
           steps{
@@ -44,22 +44,22 @@ pipeline {
         }
 
         stage('Build App Docker Image') {
-            steps {
-                script {
+             dir('./docker/app'){
+                 script {
                     appDockerImage = docker.build appImageName
-                }
-            }
+                 }
+             }
         }
 
-	stage('Push App Image') {
-          steps{
-            script {
-              docker.withRegistry( '', registryCredential ) {
-                 appDockerImage.push("$BUILD_NUMBER")
-                 appDockerImage.push('latest')
+        stage('Push App Image') {
+              steps {
+                    script {
+                        docker.withRegistry( '', registryCredential ) {
+                            appDockerImage.push("$BUILD_NUMBER")
+                            appDockerImage.push('latest')
+                        }
+                    }
               }
-            }
-          }
         }
 
         stage('Deploy with Ansible') {
